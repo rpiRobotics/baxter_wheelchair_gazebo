@@ -1,0 +1,35 @@
+<launch>
+  <arg name="use_sim_time" default="true" />
+  <arg name="gui" default="true" />
+  <arg name="paused" default="false" />
+  <arg name="debug" default="false" />
+  <arg name="headless" default="false" />
+  <arg name="world_name" default="worlds/empty.world" />
+
+  <!-- Launch Gazebo with the specified world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="$(arg paused)" />
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="use_sim_time" value="$(arg use_sim_time)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="world_name" value="$(arg world_name)" />
+  </include>
+
+  <!-- Load Baxter on Wheels' description, controllers -->
+
+  <!-- urdf xml robot description loaded on the Parameter Server-->
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find baxter_wheelchair_description)/urdf/wheelchair_gazebo.xacro'" />
+
+  <!-- Spawn Baxter_Wheelchair -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" output="screen"
+        args="-urdf -model bow -param robot_description" />
+ 
+  <include file="$(find baxter_wheelchair_control)/launch/joint_position_control.launch" />
+
+  <!-- publish all the frames to TF -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+    <param name="publish_frequency" value="50"/> <!-- Hz -->
+  </node>
+
+</launch>
