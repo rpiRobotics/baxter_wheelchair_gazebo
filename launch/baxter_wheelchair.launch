@@ -1,4 +1,5 @@
 <launch>
+  <arg name="show_rviz" default="true"/>
   <arg name="use_sim_time" default="true" />
   <arg name="gui" default="true" />
   <arg name="paused" default="false" />
@@ -31,5 +32,10 @@
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
     <param name="publish_frequency" value="50"/> <!-- Hz -->
   </node>
+
+  <!-- robot visualization in Rviz -->
+  <group if="$(arg show_rviz)">
+    <node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find baxter_wheelchair_gazebo)/launch/urdf.rviz"/> 
+  </group>
 
 </launch>
