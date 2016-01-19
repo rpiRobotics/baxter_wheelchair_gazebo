@@ -6,6 +6,7 @@
   <arg name="debug" default="false" />
   <arg name="headless" default="false" />
   <arg name="world_name" default="worlds/empty.world" />
+  <!--<arg name="world_name" default="$(find baxter_wheelchair_gazebo)/worlds/bow_home.world" />-->
 
   <!-- Launch Gazebo with the specified world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
