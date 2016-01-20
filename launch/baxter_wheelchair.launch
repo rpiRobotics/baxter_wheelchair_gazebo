@@ -1,46 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
   <arg name="show_rviz" default="true"/>
-  <arg name="use_sim_time" default="true" />
-  <arg name="gui" default="true" />
-  <arg name="paused" default="false" />
-  <arg name="debug" default="false" />
-  <arg name="headless" default="false" />
-  <arg name="world_name" default="worlds/empty.world" />
-  <!--<arg name="world_name" default="$(find baxter_wheelchair_gazebo)/worlds/bow_home.world" />-->
-
-  <!-- These arguments load the electric grippers, for example left_electric_gripper:=true -->
-  <arg name="left_electric_gripper" default="true"/>
-  <arg name="right_electric_gripper" default="true"/>
-
-  <!-- Launch Gazebo with the specified world -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="paused" value="$(arg paused)" />
-    <arg name="debug" value="$(arg debug)" />
-    <arg name="gui" value="$(arg gui)" />
-    <arg name="use_sim_time" value="$(arg use_sim_time)" />
-    <arg name="headless" value="$(arg headless)" />
-    <arg name="world_name" value="$(arg world_name)" />
-  </include>
-
-  <!-- Load the URDF into the ROS Parameter Server -->
-  <!-- This xacro will pull in baxter_base.urdf.xacro, left_end_effector.urdf.xacro,
-                                           and right_end_effector.urdf.xacro
-       Note: if you set this to false, you MUST have set the robot_description prior
-             to launching baxter_world -->
+  <arg name="baxter" default="true"/>
   <arg name="load_robot_description" default="true"/>
-  <param if="$(arg load_robot_description)" name="robot_description"
+
+  <group if="$(arg baxter)">
+    <!-- These arguments load the electric grippers, for example left_electric_gripper:=true -->
+    <arg name="left_electric_gripper" default="true"/>
+    <arg name="right_electric_gripper" default="true"/>
+
+    <!-- Load the URDF into the ROS Parameter Server -->
+    <param if="$(arg load_robot_description)" name="robot_description"
       command="$(find xacro)/xacro.py --inorder $(find baxter_wheelchair_description)/urdf/baxter_wheelchair.urdf.xacro gazebo:=true"/>
 
-  <!-- Load the software version into the ROS Parameter Server -->
-  <param name="rethink/software_version" value="1.2.0" />
+    <!-- Load the software version into the ROS Parameter Server -->
+    <param name="rethink/software_version" value="1.2.0" />
 
-  <!-- Publish a static transform between the world and the base of the robot -->
-  <node pkg="tf2_ros" type="static_transform_publisher" name="base_to_world" args="0 0 0 0 0 0 1 world base" />
+    <!-- Publish a static transform between the world and the base of the robot -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_to_world" args="0 0 0 0 0 0 1 world base" />
 
-  <!-- Run a python script to the send a service call to gazebo_ros to spawn Baxter_Wheelchair -->
-   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-	args="-param robot_description -urdf -model bow
+    <!-- Run a python script to the send a service call to gazebo_ros to spawn Baxter_Wheelchair -->
+     <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+  	args="-param robot_description -urdf -model bow -x -1.5
 	      -J baxter::right_s0 -0.272659
 	      -J baxter::right_s1 1.04701
 	      -J baxter::right_e0 -0.00123203
@@ -56,19 +37,31 @@
 	      -J baxter::left_w1 -0.0610333
 	      -J baxter::left_w2 -0.0124707" />
 
-  <!-- ros_control baxter launch file -->
-  <include file="$(find baxter_sim_hardware)/launch/baxter_sdk_control.launch">
-      <arg name="right_electric_gripper" value="$(arg right_electric_gripper)"/>
-      <arg name="left_electric_gripper" value="$(arg left_electric_gripper)"/>
-  </include>
+    <!-- ros_control baxter launch file -->
+    <include file="$(find baxter_sim_hardware)/launch/baxter_sdk_control.launch">
+        <arg name="right_electric_gripper" value="$(arg right_electric_gripper)"/>
+        <arg name="left_electric_gripper" value="$(arg left_electric_gripper)"/>
+    </include>
+  </group>
+
+  <group unless="$(arg baxter)">
+    <!-- Load the URDF into the ROS Parameter Server -->
+    <param if="$(arg load_robot_description)" name="robot_description"
+      command="$(find xacro)/xacro.py --inorder $(find baxter_wheelchair_description)/urdf/wheelchair_gazebo.xacro gazebo:=true"/>
+
+    <!-- Run a python script to the send a service call to gazebo_ros to spawn Baxter_Wheelchair -->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+      args="-param robot_description -urdf -model bow -x -1.5" />
+
+    <!-- publish all the frames to TF -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+      <param name="publish_frequency" value="50"/>
+    </node>
+
+  </group>
   
   <!-- controller manager launch file -->
   <include file="$(find baxter_wheelchair_control)/launch/joint_position_control.launch" />
-
-  <!-- publish all the frames to TF -->
-  <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
-    <param name="publish_frequency" value="50"/>
-  </node> -->
 
   <!-- robot visualization in Rviz -->
   <group if="$(arg show_rviz)">
