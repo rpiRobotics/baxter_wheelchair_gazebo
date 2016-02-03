@@ -30,6 +30,7 @@
           <geometry>
             <mesh>
               <uri>model://kitchen_dining/meshes/kitchen_dining.dae</uri>
+	      <scale>2 2 1</scale>
             </mesh>
           </geometry>
         </collision>
@@ -37,6 +38,7 @@
           <geometry>
             <mesh>
               <uri>model://kitchen_dining/meshes/kitchen_dining.dae</uri>
+	      <scale>2 2 1</scale>
             </mesh>
           </geometry>
           <cast_shadows>false</cast_shadows>
