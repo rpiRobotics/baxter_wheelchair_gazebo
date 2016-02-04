@@ -29,7 +29,7 @@
         <collision name="bow_home_collision">
           <geometry>
             <mesh>
-              <uri>model://kitchen_dining/meshes/kitchen_dining.dae</uri>
+              <uri>model://kitchen_dining/meshes/kitchen_dining_no_carpet.dae</uri>
 	      <scale>2 2 1</scale>
             </mesh>
           </geometry>
@@ -37,7 +37,7 @@
         <visual name="bow_home_visual">
           <geometry>
             <mesh>
-              <uri>model://kitchen_dining/meshes/kitchen_dining.dae</uri>
+              <uri>model://kitchen_dining/meshes/kitchen_dining_no_carpet.dae</uri>
 	      <scale>2 2 1</scale>
             </mesh>
           </geometry>
@@ -46,49 +46,28 @@
       </link>
       <static>true</static>
     </model>
-    <!-- Ground Plane -->
-    <model name="plane1_model">
-      <link name="body">
-        <collision name="geom_1">
+    <model name="carpet">
+      <link name="carpet_link">
+        <pose>-1.05 10.35 -0.0515 0 0 0</pose>
+        <collision name="carpet_collision">
           <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-            </plane>
+            <box>
+              <size>6 4 0.1</size>
+            </box>
           </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>10.0</mu>
-                <mu2>10.0</mu2>
-                <fdir1>0 0 0</fdir1>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-            </friction>
-            <bounce>
-              <restitution_coefficient>0</restitution_coefficient>
-              <threshold>1000000.0</threshold>
-            </bounce>
-            <contact>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>1e10</kp>
-                <kd>1</kd>
-                <max_vel>100.0</max_vel>
-                <min_depth>0.0001</min_depth>
-              </ode>
-            </contact>
-          </surface>
         </collision>
-        <visual name="visual_1">
+        <visual name="carpet_visual">
           <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-            </plane>
+            <box>
+              <size>6 4 0.1</size>
+            </box>
           </geometry>
           <material>
-            <script>Gazebo/Grey</script>
+            <script>
+              <uri>model://asphalt_plane/materials/scripts</uri>
+              <uri>model://asphalt_plane/materials/textures</uri>
+              <name>vrc/asphalt</name>
+            </script>
           </material>
           <cast_shadows>false</cast_shadows>
         </visual>
